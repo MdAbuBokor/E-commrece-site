@@ -1,16 +1,15 @@
 const express = require('express');
 const morgan= require('morgan'); // for see req details on console
-
+const bodyParser = require('body-parser');
 const app = express();
 
 app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
 
 const isLogedin = (req,res,next)=>{
     const login =true;
     if(login){
-        console.log("is Loged in");
         next();
     }
     else{
@@ -36,10 +35,23 @@ app.get('/api/user',isLogedin,(req,res)=>{
 
 })
 
+//client error
+app.use((req,res,next)=>{
+    res.status(404).json({
+        messege:"page not found",
+    });
+    next();
+})
 
+//server error
+app.use((err,req,res,next)=>{
+    console.log(err.stack);
+    res.status(500).json({
+        messege:"server error",
+    })
+})
 
 app.listen(3001,()=>{
     console.log("Server is running on port 3001");
 });
 
-//3 completed
